@@ -16,6 +16,12 @@ data_path <- "input/raw_data/AGMS - Round 2 Final DCT.xlsx" # data path
 convert_to_na <- c("NA", "N/A", "-", " ") # values to convert to NA
 data <- read_excel(data_path, sheet = "data", guess_max = 100000, na = convert_to_na)
 
+
+# Filter Complete interviews -------------------------------------------------------------
+data <- data %>% 
+  filter(phone_response_short == "Complete")
+
+
 # read qa-log, correction log and L13_coding_log -----------------------------------------
 url <- "https://docs.google.com/spreadsheets/d/1RS3JL-Qe-TcK6NtUM26YSRon02-AePpJXY8PCLXonYI/edit#gid=2048556262"
 googlesheets4::gs4_deauth()
@@ -31,9 +37,13 @@ if(nrow(correction_log_discrep) !=0){
   correction_log_discrep
 }
 
-# remove rejected keys -------------------------------------------------------------
+# remove rejected keys -------------------------------------------------------------------
 data <- data %>% 
   filter(KEY %notin% rejection_log$UUID)
+
+# remove extra columns -------------------------------------------------------------------
+# file.edit("R/remove_extra_columns.R")
+source("R/remove_extra_columns.R")
 
 # Filter Data ----------------------------------------------------------------------------
 data <- data %>% 

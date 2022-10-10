@@ -50,12 +50,12 @@ data <- data %>%
 data_approved <- data %>% 
   filter(qa_status %in% "Approved")
 
-# recode ---------------------------------------------------------------------------------
-# double check in output
-data <- data %>% 
-  mutate(SubmissionDate=convertToDateTime(SubmissionDate),
-         starttime=convertToDateTime(starttime),
-         endtime=convertToDateTime(endtime))
+# # recode ---------------------------------------------------------------------------------
+# # double check in output
+# data <- data %>% 
+#   mutate(SubmissionDate=convertToDateTime(SubmissionDate),
+#          starttime=convertToDateTime(starttime),
+#          endtime=convertToDateTime(endtime))
 
 # Unlabeled data (for relevancy check) -------------
 unlabeled_data <- data

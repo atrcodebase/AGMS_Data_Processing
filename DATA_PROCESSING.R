@@ -8,7 +8,7 @@ if(!require(glue)) install.packages("glue")
 if(!require(googlesheets4)) install.packages("googlesheets4")
 if(!require(dplyr)) install.packages("dplyr")
 if(!require(writexl)) install.packages("writexl")
-if(!require(tidyr)) install.packages("tidyr")
+if(!require(openxlsx)) install.packages("openxlsx")
 source("R/functions/custom_functions.R")
 
 # Read data ------------------------------------------------------------------------------
@@ -16,11 +16,9 @@ data_path <- "input/raw_data/AGMS - Round 2 Final DCT.xlsx" # data path
 convert_to_na <- c("NA", "N/A", "-", " ") # values to convert to NA
 data <- read_excel(data_path, sheet = "data", guess_max = 100000, na = convert_to_na)
 
-
 # Filter Complete interviews -------------------------------------------------------------
 data <- data %>% 
   filter(phone_response_short == "Complete")
-
 
 # read qa-log, correction log and L13_coding_log -----------------------------------------
 url <- "https://docs.google.com/spreadsheets/d/1RS3JL-Qe-TcK6NtUM26YSRon02-AePpJXY8PCLXonYI/edit#gid=2048556262"
@@ -52,6 +50,16 @@ data <- data %>%
 data_approved <- data %>% 
   filter(qa_status %in% "Approved")
 
+# recode ---------------------------------------------------------------------------------
+# double check in output
+data <- data %>% 
+  mutate(SubmissionDate=convertToDateTime(SubmissionDate),
+         starttime=convertToDateTime(starttime),
+         endtime=convertToDateTime(endtime))
+
+# Unlabeled data (for relevancy check) -------------
+unlabeled_data <- data
+
 # attach value labels ------------------------------------------
 tools_path <- "input/tools/AGMS+survey+round+2_Final (1).xlsx"
 data <- atRfunctions::labeler(data = data,
@@ -60,11 +68,11 @@ data <- atRfunctions::labeler(data = data,
                               choice_lable = "label",
                               multi_response_sep = " ")
 
-
 # Export ---------------------------------------------------------------------------------
 check_path("output/cleaned_data")
 ## export cleaned data
 writexl::write_xlsx(list("data"=data), "output/cleaned_data/AGMS_Round_2_Final_DCT_cleaned.xlsx", format_headers = F) # AGMS Cleaned Data
+writexl::write_xlsx(list("data"=unlabeled_data), "output/cleaned_data/AGMS_Round_2_Unlabeled_data.xlsx", format_headers = F) 
 ## export Correction Log Issues
 writexl::write_xlsx(correction_log, glue::glue("output/Correction_log_{Sys.Date()}.xlsx")) # correction log
 writexl::write_xlsx(correction_log_issues, "output/Correction_log_issues.xlsx", format_headers = F) # correction log issues

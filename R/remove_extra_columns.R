@@ -8,10 +8,9 @@ extra_cols <- c("deviceid", "subscriberid", "simid", "devicephonenum", "instance
   "introduction", "introduction_dari", "introduction_pashto", "call_respondent", 
   "mkp_reached", "mkp_reached_dari", "mkp_reached_pashto", "AA1", 
   "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AA8", "AA9", "AA10", 
-  "otherpresent", "end_time", "reschedule", "reschedule_full", 
-  "reschedule_no_ans", "Please_Select_The_Qa_Status_Of_The_Survey", 
+  "otherpresent", "end_time", "reschedule_full", "Please_Select_The_Qa_Status_Of_The_Survey", 
   "qa", "instanceID", "formdef_version", "review_status", "review_quality", 
-  "review_comments", "review_corrections")
+  "review_comments", "review_corrections") #kept "reschedule", "reschedule_no_ans"
 
 data <- data %>% 
   select(-all_of(extra_cols))

@@ -172,3 +172,42 @@ rank_check <- function(data){
   }
   return(relevancy_log[-1,])
 }
+
+check_select_multiple <- function(data, multi_vars){
+  series_log <- data.frame(KEY=NA,question=NA,value=NA,series_columns=NA,
+                              series_values=NA,Remarks=NA)
+  
+  for(question in multi_vars){
+    print(paste0("Checking: ", question))
+    series_cols <- names(data)[grepl(question, names(data))]
+    
+    data_sub <- data %>% 
+      select(series_cols, KEY) %>% 
+      filter(!is.na(get(question)))
+    
+    for(i in 1:nrow(data_sub)){
+      #question value
+      val <- str_split(data_sub[[question]][i], " ")[[1]]
+      #make related series column name
+      series_columns <- paste0(question,"_", val) 
+      if(!all(series_columns %in% names(data_sub))){
+        log <- c(data_sub$KEY[i], 
+                 question, 
+                 data_sub[[question]][i], 
+                 paste0(series_columns, collapse = " - "),
+                 "", 
+                 Remarks="Series column not in data")
+        series_log <- rbind(series_log, log)
+      } else if(any(data_sub[i,series_columns] %in% c(NA, 0))){
+        log <- c(data_sub$KEY[i], 
+                 question, 
+                 data_sub[[question]][i], 
+                 paste0(series_columns, collapse = " - "),
+                 paste0(data_sub[i,series_columns], collapse = " - "),
+                 Remarks = "Inonsistent series columns")
+        series_log <- rbind(series_log, log)
+      }
+    }
+  }
+  return(series_log[-1,])
+}

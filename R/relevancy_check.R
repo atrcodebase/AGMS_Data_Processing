@@ -15,12 +15,26 @@ tool_relevancy <- read_excel("input/tools/tool_relevancies.xlsx")
 
 #apply function --------------------------------------------------------------------------
 relevancy_issues <- relevancy_check(data, tool_relevancy)
-
 # check Rank option question
 relevancy_issues <- rbind(
   relevancy_issues, 
   rank_check(data)
 )
 
+# note: This uuid value is O instead of 0 in the log
+data$h5[data$KEY == "uuid:f35ecd9e-16b0-4a01-991b-69290774790f"] <- 0
+
+#select multiple questions ---------------------------------------------------------------
+multi_vars <- c("early_marriage4", "h1", "h5", "h6", "Q2t", "rank1", "rank2", 
+               "rank3", "rank4", "rank5", "b7", "b8", "b9", "Q10cbsg6", "safety1", 
+               "safety2", "safety3", "safety4", "wfws12", "wr4", "wr8", "wr10")
+series_log <- check_select_multiple(data, multi_vars)
+
+
 #Export ----------------------------------------------------------------------------------
-writexl::write_xlsx(relevancy_issues, "output/Tool_relevancy_issues.xlsx")
+export_list <- list(
+  relevancy_issues=relevancy_issues,
+  select_multiple=series_log
+)
+
+writexl::write_xlsx(export_list, "output/Tool_relevancy_issues.xlsx")

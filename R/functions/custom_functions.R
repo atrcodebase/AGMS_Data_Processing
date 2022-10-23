@@ -190,6 +190,7 @@ check_select_multiple <- function(data, multi_vars){
       val <- str_split(data_sub[[question]][i], " ")[[1]]
       #make related series column name
       series_columns <- paste0(question,"_", val) 
+      other_columns <- names(data_sub)[names(data_sub) %notin% c(series_columns, question, "KEY")]
       if(!all(series_columns %in% names(data_sub))){
         log <- c(data_sub$KEY[i], 
                  question, 
@@ -205,6 +206,16 @@ check_select_multiple <- function(data, multi_vars){
                  paste0(series_columns, collapse = " - "),
                  paste0(data_sub[i,series_columns], collapse = " - "),
                  Remarks = "Inonsistent series columns")
+        series_log <- rbind(series_log, log)
+      } else if(any(data_sub[i, other_columns] %in% 1)){
+        
+        other_cols <- other_columns[which(data_sub[i, other_columns] %in% 1)]
+        log <- c(data_sub$KEY[i], 
+                 question, 
+                 data_sub[[question]][i], 
+                 paste0(other_cols, collapse = " - "),
+                 paste0(data_sub[i,other_cols], collapse = " - "),
+                 Remarks = "Series column not in question values")
         series_log <- rbind(series_log, log)
       }
     }
